@@ -1,11 +1,3 @@
-# configuration
-group_ids = ["1516779", "1435713"]
-base_url = "https://api.groupme.com/v3/"
-access_token = "19a5dd8070060131ed2c727e4f5cb2e5"
-like_threshold = 3
-context_lines = 3 # x before and x after
-forty_eight_hours_ago = int(time.time() - 86400)
-
 # required libraries
 import sys
 import time
@@ -13,6 +5,19 @@ import json
 import urllib2
 from urllib2 import urlopen
 from time import sleep
+
+
+# configuration
+# TODO: yaml
+group_ids = ["1516779", "1435713"] # needs to be an array
+base_url = "https://api.groupme.com/v3/"
+access_token = "19a5dd8070060131ed2c727e4f5cb2e5"
+likes_for_best_of = 3
+sleep_for = 5
+lines_of_context = 3 # x before and x after
+forty_eight_hours_ago = int(time.time() - 86400)
+
+# TODO: general, try/excepts
 
 # base groupme api call
 def api_call(command, parms=None):
@@ -52,9 +57,11 @@ def get_messages(group_id, before_id=False):
 #def get_context(message_id, lines):
 	# get x lines before and after favorite
 
+# main loop
 for group_id in group_ids:
 	best_of = []
-
+	
+	# TODO: refactor some of this and get_context 
 	# get latest message id
 	data = get_group(group_id)
 	latest_message = data["response"]["messages"]["last_message_id"]
@@ -76,7 +83,7 @@ for group_id in group_ids:
 			message_ids.append([message["id"],message["created_at"],likes])
 
 			# is this a best of?
-			if likes >= like_threshold:
+			if likes >= likes_for_best_of:
 				best_of.append(message)
 				print message["name"] + "("+str(likes)+"):", message["text"]
 
@@ -86,11 +93,12 @@ for group_id in group_ids:
 		created_at = oldest_message[1]
 
 		# wait, so we don't kill the api
-		sleep(5)
+		sleep(sleep_for)
 
 	# end while
 
-	# do something with results
+	# TODO: do something with results
+	# TODO: get context for each best of
 	# print best_of
 	
 # end for
